@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Batalla Naval</title>
+        <link rel="stylesheet" href="/css/base.css">
+    </head>
+    <body>
+        <div class="container">
+            <header class="sixteen columns">
+                <div id="logo">
+                    <h1>Batalla naval</h1>
+                    <h2><a href="/login"> Iniciar sesion </a> </h2> 
+                </div>
+            </header>
+            <div id="overview">
+                <h3>Bienvenido al juego de batalla naval.</h3>
+                <hr />
+            </div>
+            <div id="columna_central" >
+                <h3> Registrar </h3>
+                    <br> <%= @message %> </br>
+                <form method="post" action="player" >
+                    <br> Username:<br>
+                    <input type="text" name="username">
+                    <br>Password:<br>
+                    <input type="password" name="password">
+                    <input type="submit" value="Registrarse">
+                </form>
+            </div>
+            <footer >
+                <hr />
+                <ul>
+                    <li>&copy; Batalla Naval. All rights reserved.</li>
+                </ul>
+            </footer>
+        </div>
+    </body>
+</html>

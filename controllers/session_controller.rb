@@ -1,7 +1,7 @@
 class Server < Sinatra::Base
 
 	def session_enable
-    if defined?(session[:enable]) && session[:enable]
+    if defined?(session[:id])
       true
     else
       redirect ("/login")
@@ -10,7 +10,6 @@ class Server < Sinatra::Base
   
   def session_logout
 		session.clear
-		session[:enable]=false
 		redirect '/'
 	end
 end

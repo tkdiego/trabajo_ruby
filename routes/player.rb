@@ -7,15 +7,17 @@ class Server < Sinatra::Base
   end
 
   post '/player' do
-    user = params[:username]
-    pass= params[:password] 
-    user_exist=!(Player.where("players.username == '#{user}'").empty?)
-    if  !(user_exist) && Player.create(:username => user,:password => pass).valid? 
+    new_player=Player.new
+    new_player.username= params[:username]
+    new_player.password= params[:password] 
+   # if !(new_player.exist?(new_player.username)) && Player.create(:username => user,:password => pass).valid?  
+    if !(new_player.exist?(new_player.username)) && new_player.valid?  
+        new_player.save
         status 201
-        @message="Bienvenido " + params[:username] + " ya puede iniciar sesion"
+        @message="Bienvenido #{new_player.username} ya puede iniciar sesion"
         erb :"player/login"
     else
-      if user_exist
+      if new_player.exist?(new_player.username)
         status 409
         @message="El usuario ya existe"
         erb :"player/sign_in"

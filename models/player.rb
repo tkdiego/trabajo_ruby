@@ -7,9 +7,14 @@ class Player< ActiveRecord::Base
   has_many :attacks, through: :games
 
 
+  def authenticate(username, password)
+   !(Player.where(username: username, password: password).first).nil?
+  end
+
   def exist?(username)
     !(Player.where username: username).empty?
   end
+
 end
 
   

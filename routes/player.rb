@@ -42,15 +42,16 @@ class Server < Sinatra::Base
 
   get '/players/?' do
     session_enable
-  	@list_players = Player.where("players.id != #{session[:id]}")
+    @list_players = Player.where.not(id: session[:id])
     erb :"player/list"
   end
 
   post '/login' do
   	p=Player.find_by username:(params[:username])
-	  if (!(p.nil?) && (p.password== params[:password]) ) then
+    if !(p.nil?) && p.authenticate(p.username,p.password)
       session[:id] = p.id
       session[:username] = p.username
+      session[:enable] = true
       erb :"player/menu"
 	  else
       status 401

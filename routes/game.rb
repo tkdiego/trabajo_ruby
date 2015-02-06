@@ -33,12 +33,9 @@ class Server < Sinatra::Base
       redirect '/players/games/'+params[:id_game]
     end
     @ships_positions=params.select{|h| h!='_method' && h!= 'splat' && h!= 'id' && h!= 'id_game' && h!= 'captures' && h!= 'left_ships'}
-#    for ships in @ships_positions
-      Ship.new.create_ships(params[:id_game], session[:id], @ships_positions)
-#      Ship.create(:game_id => params[:id_game],:player_id => session[:id],:position => ships[1].to_s, :attacked => 0)
-#    end
-    ready= Game.find_by_id(params[:id_game]).players_ready + 1
-    Game.update(params[:id_game],:players_ready => ready)
+    game = Game.find_by id: params[:id_game]
+    game.create_ships(session[:id], @ships_positions)
+    game.update_players_ready(game.players_ready + 1)
     redirect '/players/'+ params[:id]+'/games/'+params[:id_game]
   end
 

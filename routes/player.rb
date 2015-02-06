@@ -48,7 +48,7 @@ class Server < Sinatra::Base
 
   post '/login' do
   	p=Player.find_by username:(params[:username])
-    if !(p.nil?) && p.authenticate(p.username,p.password)
+    if !(p.nil?) && p.authenticate(p.username,params[:password])
       session[:id] = p.id
       session[:username] = p.username
       session[:enable] = true

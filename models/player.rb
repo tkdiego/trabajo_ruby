@@ -5,13 +5,13 @@ class Player< ActiveRecord::Base
   has_many :games
 
   def authenticate(username, password)
-   !(Player.where(username: username, password: password).first).nil?
+  	(Player.where(username: username, password: password).first).instance_of?(Player)
   end
 
   def exist?(username)
     !(Player.where username: username).empty?
   end
-
+  
 end
 
 

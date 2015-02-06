@@ -6,7 +6,6 @@ class Player< ActiveRecord::Base
   has_many :ships , through: :games
   has_many :attacks, through: :games
 
-
   def authenticate(username, password)
    !(Player.where(username: username, password: password).first).nil?
   end

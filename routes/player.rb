@@ -1,6 +1,6 @@
 class Server < Sinatra::Base
   enable :sessions
-
+  
   get '/' do
   	session_enable
     erb :"player/menu"
@@ -10,7 +10,6 @@ class Server < Sinatra::Base
     new_player=Player.new
     new_player.username= params[:username]
     new_player.password= params[:password] 
-   # if !(new_player.exist?(new_player.username)) && Player.create(:username => user,:password => pass).valid?  
     if !(new_player.exist?(new_player.username)) && new_player.valid?  
         new_player.save
         status 201
@@ -52,7 +51,6 @@ class Server < Sinatra::Base
 	  if (!(p.nil?) && (p.password== params[:password]) ) then
       session[:id] = p.id
       session[:username] = p.username
-      session[:enable] = true
       erb :"player/menu"
 	  else
       status 401

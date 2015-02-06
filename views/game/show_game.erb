@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Batalla Naval</title>
+        <link rel="stylesheet" href="/css/base.css">
+        <script type="text/javascript" src="/script/javascript.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <header class="sixteen columns">
+                <div id="logo">
+                    <h1>Batalla naval</h1>
+                    <h2>Usuario: <%= session[:username] %> | <a href="/logout"> Logout </a> </h2>
+                </div>
+            </header>
+            <div id="overview">
+                <h3>Es el turno de <%= @turn_player %>. Por favor, realice su ataque.</h3>
+                <hr />
+            </div>
+
+            <div id="columna1"> 
+                <h1> TU TABLA</h1>
+                <table>
+                    <% @game.table.to_i.times do |column|%>
+                      <tr>
+                          <% @game.table.to_i.times do |row|%>
+                            <td>
+                                <% @coordinate= column.to_s + ':' + row.to_s 
+                                @icon_ship = false
+                                for ship in @ships do 
+                                  if ship.position == @coordinate 
+                                    @icon_ship = true
+                                    if ship.attacked == 1%>
+                                      <img src= "/images/fire.png" />
+                                    <%else%>
+                                      <img src= "/images/ship.gif" />
+                                    <%end
+                                  end 
+                                  end
+                                if @icon_ship == false %>
+                                  <img  src= "/images/water.gif" />
+                                <% end %>
+                            </td>
+                          <% end %>
+                      </tr>
+                    <% end %>
+                </table>
+            </div> 
+            <div id="columna2">
+                <h1> TABLA ENEMIGA </h1>
+                <form action="/player/<%= session[:id]%>/games/<%= @game.id %>/move" onsubmit="return control_attack()"  method="post">
+                    <table>
+                        <% @game.table.to_i.times do |column|%>
+                          <tr>
+                              <% @game.table.to_i.times do |row|%>
+                                <td> 
+                                    <% @coordinate_enemy= column.to_s + ':' + row.to_s 
+                                    @icon_attack_enemy = false
+                                    for enemy_attack in @enemy_attacks do 
+                                      if enemy_attack.position == @coordinate_enemy
+                                        @icon_attack_enemy = true 
+                                        if enemy_attack.state == "throw" %>
+                                          <img src= "/images/fire.png" />
+                                        <%else%>
+                                          <img src= "/images/miss.png" />
+                                        <%end
+                                      end
+                                      end 
+                                    if @icon_attack_enemy == false%>
+                                      <input src="/images/water.gif" type="image" onclick="set_attack('<%= column.to_s + ':' + row.to_s %>')" > 
+                                    <%end%>
+                                </td>
+                              <% end %>
+                          </tr>
+                        <% end %>
+                    </table>
+                    <input type="hidden" name="attack" id="attack" value="">
+                    <input type="hidden" id="first_attack" value="0">
+                </form>
+            </div>
+            <ul><a href="/players/<%= session[:id] %>/games"> Volver a listar las partidas </a></ul>
+            <footer >
+                <hr />
+                <ul>
+                    <li>&copy; Batalla Naval. All rights reserved.</li>
+                </ul>
+            </footer>
+        </div><
+    </body>
+</html>

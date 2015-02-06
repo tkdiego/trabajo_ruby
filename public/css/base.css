@@ -1,0 +1,103 @@
+
+#columna1 {
+    float:left; 
+    width:400px;
+}
+#columna2 {
+    float:right;
+    margin-left:210px;
+}
+#columna_central {
+    float:none;
+    margin-left:410px;
+}
+
+html, body, div, h1, h2, h3, h4, h5, h6, p, center,ol, ul, li, form,footer, header {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline; }
+footer, header, menu, nav {
+    display: block; }
+body {
+    line-height: 1; }
+ol, ul {
+    list-style: none; }
+
+table {
+    border: saddlebrown;
+}
+
+body {
+    background: #fff;
+    font: 14px/21px Arial, sans-serif;
+    color: #444;
+    -webkit-font-smoothing: antialiased; /* Fix for webkit rendering */
+    -webkit-text-size-adjust: 100%;
+    -webkit-transition: background-color 0.8s ease-out;
+    -moz-transition: background-color 0.8s ease-out;
+    -o-transition: background-color 0.8s ease-out;
+    transition: background-color 0.8s ease-out;
+}
+
+
+h1, h2, h3 {
+    color: #222;
+    font-family: Georgia, Arial, sans-serif;
+    font-weight: normal; }
+h1 a, h2 a, h3 a{ font-weight: inherit; }
+h1 { font-size: 46px; line-height: 50px; margin-bottom: 14px;}
+h2 { font-size: 35px; line-height: 40px; margin-bottom: 10px; }
+h3 { font-size: 28px; line-height: 34px; margin-bottom: 6px; }
+.subheader { color: #777; }
+
+p { margin: 0 0 20px 0; }
+p img { margin: 0; }
+p.lead { font-size: 21px; line-height: 27px; color: #777;  }
+
+hr { border: solid #ddd; border-width: 1px 0 0; clear: both; margin: 10px 0 30px; height: 0; }
+
+
+a, a:visited { color: #333; text-decoration: underline; outline: 0; }
+a:hover, a:focus { color: #777; }
+p a, p a:visited { line-height: inherit; }
+
+.container                                  { position: relative; width: 1200px; margin: 0 auto; padding: 0; }
+.container .column,
+.container .columns                         { display: inline; margin-left: 10px; }
+h1 { font-size: 48px; line-height: 1.2; }
+h2 { font-size: 36px; line-height: 1.2; }
+h3 { font-size: 24px; line-height: 1.2; }
+
+header {
+    padding-top: 80px;
+    border-top: 3px solid #000;
+}
+
+
+#logo h2, #logoDetailView h2 {
+
+    font-style: italic;
+    font-size: 16px;
+    margin-top: -23px;
+    float: right;
+}
+
+footer {
+    margin-top: 0px;
+    margin-bottom: 40px;
+}
+
+footer p {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: 0;	
+}
+
+
+

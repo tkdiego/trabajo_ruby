@@ -1,6 +1,6 @@
 class Server < Sinatra::Base
   enable :sessions
-  
+
   get '/' do
   	session_enable
     erb :"player/menu"
@@ -47,7 +47,7 @@ class Server < Sinatra::Base
   end
 
   post '/login' do
-  	p=Player.find_by_username(params[:username])
+  	p=Player.find_by username:(params[:username])
 	  if (!(p.nil?) && (p.password== params[:password]) ) then
       session[:id] = p.id
       session[:username] = p.username

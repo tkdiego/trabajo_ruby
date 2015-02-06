@@ -14,11 +14,14 @@
 ActiveRecord::Schema.define(version: 20150130193153) do
 
   create_table "attacks", force: :cascade do |t|
-    t.integer "id_player"
-    t.integer "id_game"
+    t.integer "game_id"
+    t.integer "player_id"
     t.string  "position"
     t.string  "state"
   end
+
+  add_index "attacks", ["game_id"], name: "index_attacks_on_game_id"
+  add_index "attacks", ["player_id"], name: "index_attacks_on_player_id"
 
   create_table "games", force: :cascade do |t|
     t.integer "id_creator"
@@ -34,10 +37,13 @@ ActiveRecord::Schema.define(version: 20150130193153) do
   end
 
   create_table "ships", force: :cascade do |t|
-    t.integer "id_game"
-    t.integer "id_player"
+    t.integer "game_id"
+    t.integer "player_id"
     t.string  "position"
     t.integer "attacked"
   end
+
+  add_index "ships", ["game_id"], name: "index_ships_on_game_id"
+  add_index "ships", ["player_id"], name: "index_ships_on_player_id"
 
 end

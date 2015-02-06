@@ -4,12 +4,12 @@ class Server < Sinatra::Base
   # -------- Crear una partida --------
   post '/players/games' do
     session_enable
-    opponent=Player.find_by_username(params[:opponent])
+    opponent=Player.new.find_player(params[:opponent])
     if params[:table].nil? || opponent.nil?  
       halt 400, "Seleccione tabla y oponente" 
     else
       exist_game_with (opponent)
-		  @game= Game.create(:id_creator => session[:id], :id_opponent => opponent.id, :table => params[:table], :turn => opponent.id, :players_ready => 0)
+		  @game= Game.new.create_game(session[:id], opponent.id,params[:table], opponent.id)
       status 201
       ships_remaining
 		  erb :"game/select_positions"
@@ -33,9 +33,10 @@ class Server < Sinatra::Base
       redirect '/players/games/'+params[:id_game]
     end
     @ships_positions=params.select{|h| h!='_method' && h!= 'splat' && h!= 'id' && h!= 'id_game' && h!= 'captures' && h!= 'left_ships'}
-    for ships in @ships_positions
-      Ship.create(:id_game => params[:id_game],:id_player => session[:id],:position => ships[1].to_s, :attacked => 0)
-    end
+#    for ships in @ships_positions
+      Ship.new.create_ships(params[:id_game], session[:id], @ships_positions)
+#      Ship.create(:game_id => params[:id_game],:player_id => session[:id],:position => ships[1].to_s, :attacked => 0)
+#    end
     ready= Game.find_by_id(params[:id_game]).players_ready + 1
     Game.update(params[:id_game],:players_ready => ready)
     redirect '/players/'+ params[:id]+'/games/'+params[:id_game]
@@ -45,7 +46,7 @@ class Server < Sinatra::Base
   get '/players/:id/games/:id_game' do
     session_enable
     game_exist
-    if (Ship.where(id_game:params[:id_game],id_player:session[:id])).empty?
+    if (Ship.where(game_id:params[:id_game],player_id:session[:id])).empty?
       redirect '/players/games/'+ params[:id_game]
     end
     @game= Game.find_by_id(params[:id_game])
@@ -54,8 +55,8 @@ class Server < Sinatra::Base
       @message = 'Has perdido!'
       erb :"/game/game_over"
     else
-      @ships=Ship.where(id_game:params[:id_game],id_player:session[:id])
-      @enemy_attacks= Attack.where(id_game:params[:id_game],id_player:session[:id])
+      @ships=Ship.where(game_id:params[:id_game],player_id:session[:id])
+      @enemy_attacks= Attack.where(game_id:params[:id_game],player_id:session[:id])
       if @game.turn == session[:id] or @game.players_ready != 2
         sleep 1.5
         @turn_player = "Enemigo"
@@ -68,7 +69,7 @@ class Server < Sinatra::Base
   end
   
   # -------- Listar partidas -------
-  get '/players/:id_player/games' do
+  get '/players/:player_id/games' do
     session_enable
     @list_games=[]
     games= Game.select("games.id_opponent, games.id").joins("INNER JOIN players on games.id_creator = players.id").where("players.id == #{session[:id]} and games.id_opponent != #{session[:id]}")
@@ -85,19 +86,19 @@ class Server < Sinatra::Base
   end
   
   #-------- Hacer una jugada --------
-  post '/player/:id_player/games/:id_game/move' do
+  post '/player/:player_id/games/:id_game/move' do
     session_enable
     game_turn_player
-    ship= Ship.where("ships.id_game == #{params[:id_game]} AND ships.id_player != #{session[:id]} AND ships.position == '#{params[:attack].to_s}'")
+    ship= Ship.where("ships.game_id == #{params[:id_game]} AND ships.player_id != #{session[:id]} AND ships.position == '#{params[:attack].to_s}'")
     #   Se actualiza el barco como atacado para luego mostrar en el mapa.
     if ship.empty?
-      Attack.create(:id_player => session[:id], :id_game => params[:id_game], :position => params[:attack].to_s, :state => "miss")
+      Attack.create_attack(session[:id], params[:id_game], params[:attack].to_s, "miss")
     else
-      Attack.create(:id_player => session[:id], :id_game => params[:id_game], :position => params[:attack].to_s, :state => "throw")
-      Ship.update(ship.last.id, :attacked => 1)
+      Attack.create_attack(session[:id], params[:id_game], params[:attack].to_s, "throw")
+      Ship.ship_update(ship.last.id, 1)
     end  
     status 201
-    if Ship.where("ships.id_game == #{params[:id_game]} AND ships.id_player != #{session[:id]} AND ships.attacked == 0").empty?
+    if enemy_ships_saved(params[:id_game], session[:id]).empty?
       Game.update(params[:id_game],:turn => 0)
       @message= "Has ganado!"
       erb :"/game/game_over"

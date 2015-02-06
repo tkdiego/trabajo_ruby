@@ -4,9 +4,14 @@ class Player< ActiveRecord::Base
   validates :password, presence: true, length: { minimum: 4 }
   has_many :games
 
+  def authenticate(username, password)
+   !(Player.where(username: username, password: password).first).nil?
+  end
+
   def exist?(username)
     !(Player.where username: username).empty?
   end
+
 end
 
 

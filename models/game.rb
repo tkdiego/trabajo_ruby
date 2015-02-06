@@ -7,5 +7,4 @@ class Game< ActiveRecord::Base
   
   has_many :ships, dependent: :destroy
   has_many :attacks,  dependent: :destroy
-  has_one :player
 end

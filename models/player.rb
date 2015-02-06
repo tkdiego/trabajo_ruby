@@ -13,6 +13,10 @@ class Player< ActiveRecord::Base
   def exist?(username)
     !(Player.where username: username).empty?
   end
+  
+  def find_player(enemy)
+    Player.find_by_username(enemy)
+  end
 
 end
 

@@ -2,7 +2,7 @@ class Server < Sinatra::Base
   
   def game_exist
     game= Game.where("games.id == #{params[:id_game]} AND (games.id_creator == #{session[:id]} OR games.id_opponent == #{session[:id]})")
-    if game.length < 0
+    if game.length == 0
       halt 400, "400 Bad request" + " <a href='/players/#{session[:id]}/games'> Volver al listado de las partidas </a>"
     end
   end
@@ -44,13 +44,4 @@ class Server < Sinatra::Base
     Game.delete(params[:id_game])
   end
   
-  def exist_game_with (opponent)
-    g1= Game.where(id_opponent:opponent.id, id_creator:session[:id])
-    g2= Game.where(id_opponent:session[:id], id_creator:opponent.id)
-    if !(g1.empty? && g2.empty?)
-      halt 409, "Ya ha iniciado una partida con el rival seleccionado" + " <a href='/players/#{session[:id]}/games'> Volver </a>"
-    end
-  end
-  
- 
 end

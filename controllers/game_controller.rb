@@ -1,14 +1,14 @@
 class Server < Sinatra::Base
   
   def game_exist
-    game= Game.where("games.id == #{params[:id_game]} AND (games.id_creator == #{session[:id]} OR games.id_opponent == #{session[:id]})")
+    game= Game.where("games.id == #{params[:id_game]} AND (games.creator_id == #{session[:id]} OR games.opponent_id == #{session[:id]})")
     if game.length == 0
       halt 400, "400 Bad request" + " <a href='/players/#{session[:id]}/games'> Volver al listado de las partidas </a>"
     end
   end
   
   def game_turn_player
-    game= Game.where("games.id == #{params[:id_game]} AND (games.id_creator == #{session[:id]} OR games.id_opponent == #{session[:id]})")
+    game= Game.where("games.id == #{params[:id_game]} AND (games.creator_id == #{session[:id]} OR games.opponent_id == #{session[:id]})")
     if game.length <= 0
       halt 400, "400 Bad request" + " <a href='/players/#{session[:id]}/games'> Volver al listado de las partidas </a>"
     end

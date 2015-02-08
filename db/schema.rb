@@ -24,8 +24,8 @@ ActiveRecord::Schema.define(version: 20150130193153) do
   add_index "attacks", ["player_id"], name: "index_attacks_on_player_id"
 
   create_table "games", force: :cascade do |t|
-    t.integer "id_creator"
-    t.integer "id_opponent"
+    t.integer "creator_id"
+    t.integer "opponent_id"
     t.integer "table"
     t.integer "turn"
     t.integer "players_ready"

@@ -13,13 +13,12 @@ class Server < Sinatra::Base
       erb :"player/list", :layout => :layout
     else
       @game.create_game(session[:id], opponent.id, params[:table], opponent.id)
-      @ships_remaining=@game.ships_remaining(@game.table)
       status 201
       erb :"game/select_positions", :layout => :layout
     end
   end
     
-  # -------- Tabla de barcos --------
+  # -------- Seleccionar posicion de los barcos --------
   get '/players/games/:id_game' do
     session_enable
     @game=Game.find_by_id(params[:id_game])
@@ -27,7 +26,7 @@ class Server < Sinatra::Base
       status 400
       #      hacer un mensaje de que no existe
     end
-    ships_remaining#VA EN EL MODELO
+    @ships_remaining=@game.ships_remaining(@game.table)
     erb :"game/select_positions",:layout => :layout
   end
 
@@ -78,14 +77,14 @@ class Server < Sinatra::Base
   get '/players/:player_id/games' do
     session_enable
     @list_games=[]
-    games= Game.select("games.id_opponent, games.id").joins("INNER JOIN players on games.id_creator = players.id").where("players.id == #{session[:id]} and games.id_opponent != #{session[:id]}")
+    games=(Player.find_by id:(session[:id])).get_games_as_creator
     for game in games
-      player = Player.find_by_id(game.id_opponent)
+      player = Player.find_by_id(game.opponent_id)
       @list_games << [player.username, game.id]
     end
-    games= Game.select("games.id_creator, games.id").joins("INNER JOIN players on games.id_opponent = players.id").where("players.id == #{session[:id]} and games.id_creator != #{session[:id]}")
+    games=(Player.find_by id:(session[:id])).get_games_as_opponent
     for game in games
-      player = Player.find_by_id(game.id_creator)
+      player = Player.find_by_id(game.creator_id)
       @list_games << [player.username, game.id]
     end
     erb :"/game/list_games", :layout => :layout

@@ -9,5 +9,4 @@ class Attack< ActiveRecord::Base
 #    Attack.create(:player_id => player_id, :game_id => game_id, :position => position, :state => state)
      Player.find_by id:(player_id).attacks.create(game_id: game_id, position: position, state: state)
   end
-  
 end

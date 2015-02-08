@@ -42,11 +42,11 @@ class Game< ActiveRecord::Base
   def ships_remaining (table_size)
     case table_size
     when 5
-      return 7
+      7
     when 10
-      return 15
+      15
     else
-      return 20
+      20
     end
   end
   

@@ -26,7 +26,7 @@ class Server < Sinatra::Base
       status 400
       #      hacer un mensaje de que no existe
     end
-    @ships_remaining=@game.ships_remaining(@game.table)
+    @ships_remaining= @game.ships_remaining(@game.table)
     erb :"game/select_positions",:layout => :layout
   end
 

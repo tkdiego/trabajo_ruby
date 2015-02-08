@@ -3,7 +3,7 @@ class Server < Sinatra::Base
 
   get '/' do
   	session_enable
-    erb :"player/menu"
+    erb :"player/menu", :layout => :layout
   end
 
   post '/player' do
@@ -11,29 +11,28 @@ class Server < Sinatra::Base
     new_player.username= params[:username]
     new_player.password= params[:password] 
     if !(new_player.exist?(new_player.username)) && new_player.valid?  
-        new_player.save
-        status 201
-        @message="Bienvenido #{new_player.username} ya puede iniciar sesion"
-        erb :"player/login"
+      new_player.save
+      status 201
+      @message="Bienvenido #{new_player.username} ya puede iniciar sesion"
+      erb :"player/login", :layout => :layout
     else
       if new_player.exist?(new_player.username)
         status 409
         @message="El usuario ya existe"
-        erb :"player/sign_in"
       else
         status 400
-        @message="Usuario o contraseña invalidos"
-        erb :"player/sign_in"
+        @message="Usuario o contraseña invalidos"  
       end
-    end
+      erb :"player/sign_in", :layout => :layout
+    end     
   end
 
 	get '/login' do
-    erb :"player/login"
+    erb :"player/login", :layout => :layout
 	end
 
   get '/sign_in' do
-    erb :"player/sign_in"
+    erb :"player/sign_in", :layout => :layout
   end
   
 	get '/logout' do
@@ -43,7 +42,7 @@ class Server < Sinatra::Base
   get '/players/?' do
     session_enable
     @list_players = Player.where.not(id: session[:id])
-    erb :"player/list"
+    erb :"player/list", :layout => :layout
   end
 
   post '/login' do
@@ -51,11 +50,11 @@ class Server < Sinatra::Base
     if !(p.nil?) && p.authenticate(p.username,params[:password])
       session[:id] = p.id
       session[:enable] = true
-      erb :"player/menu"
+      erb :"player/menu", :layout => :layout
 	  else
       status 401
       @message="Usuario o contraseña invalidos"
-      erb :"player/login"
+      erb :"player/login", :layout => :layout
 	  end
   end
 end

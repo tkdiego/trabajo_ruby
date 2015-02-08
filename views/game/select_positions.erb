@@ -1,13 +1,4 @@
-<!doctype html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Batalla Naval</title>
-        <link rel="stylesheet" href="/css/base.css">
-        <script type="text/javascript" src="/script/javascript.js"></script>
-    </head>
-    <body>
-        <div class="container">
+         <div class="container">
             <header class="sixteen columns">
                 <div id="logo">
                     <h1>Batalla naval</h1>
@@ -34,15 +25,7 @@
                     </table>
                     <br>Se necesita ubicar <input type="text" maxlength="2" size="2" readonly="readonly" style="border:none" name="left_ships" id="left_ships" value="<%= @ships_remaining %>">barcos restantes </br>
                     <input type="hidden" name="_method" value="put" />
+                    <input type="hidden" name="id_game" value="<%= @game.id %>" />
                     <input type="submit" value="Iniciar partida">
                 </form>
             </div>
-            <footer >
-                <hr />
-                <ul>
-                    <li>&copy; Batalla Naval. All rights reserved.</li>
-                </ul>
-            </footer>
-        </div>
-    </body>
-</html>

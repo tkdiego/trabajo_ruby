@@ -10,25 +10,25 @@ class Server < Sinatra::Base
     if @game.exist_game_between(creator, opponent)
       @message="Ya ha iniciado una partida con el rival seleccionado"
       @list_players = Player.where.not(id: session[:id])
-      erb :"player/list"
+      erb :"player/list", :layout => :layout
     else
       @game.create_game(session[:id], opponent.id, params[:table], opponent.id)
       @ships_remaining=@game.ships_remaining(@game.table)
       status 201
-      erb :"game/select_positions"
+      erb :"game/select_positions", :layout => :layout
     end
   end
     
   # -------- Tabla de barcos --------
   get '/players/games/:id_game' do
     session_enable
+    @game=Game.find_by_id(params[:id_game])
     if @game.game_not_exist_for_player?(session[:id])
       status 400
-#      hacer un mensaje de que no existe
+      #      hacer un mensaje de que no existe
     end
-    @game=Game.find_by_id(params[:id_game])
     ships_remaining#VA EN EL MODELO
-    erb :"game/select_positions"
+    erb :"game/select_positions",:layout => :layout
   end
 
   # -------- Creacion de los barcos --------
@@ -49,9 +49,9 @@ class Server < Sinatra::Base
   get '/players/:id/games/:id_game' do
     session_enable
     @game= Game.find_by_id(params[:id_game])
-    if @game.game_not_exist?(session[:id])
+    if @game.game_not_exist_for_player?(session[:id])
       status 400
-#      hacer un mensaje de que no existe
+      #      hacer un mensaje de que no existe
     end
     if (@game.exist_ships?(session[:id]))
       redirect '/players/games/'+ params[:id_game]
@@ -59,7 +59,7 @@ class Server < Sinatra::Base
     if @game.game_over?
       @game.destroy_game_complete
       @message = 'Has perdido!'
-      erb :"/game/game_over"
+      erb :"/game/game_over", :layout => :layout
     else
       @ships = @game.bring_ships(session[:id])
       @enemy_attacks = @game.bring_attacks(session[:id])
@@ -69,7 +69,7 @@ class Server < Sinatra::Base
         erb :"game/wait_turn"
       else
         @turn_player = Player.find_by id:(session[:id])
-        erb :"game/show_game"
+        erb :"game/show_game", :layout => :layout
       end 
     end  
   end
@@ -88,36 +88,48 @@ class Server < Sinatra::Base
       player = Player.find_by_id(game.id_creator)
       @list_games << [player.username, game.id]
     end
-    erb :"/game/list_games"
+    erb :"/game/list_games", :layout => :layout
   end
   
   #-------- Hacer una jugada --------
   post '/player/:player_id/games/:id_game/move' do
     session_enable
-    game_turn_player
-    ship= Ship.where("ships.game_id == #{params[:id_game]} AND ships.player_id != #{session[:id]} AND ships.position == '#{params[:attack].to_s}'")
+    game = Game.find_by id: params[:id_game]
+    if game.game_not_exist_for_player?(session[:id])
+      status 400
+      #    mensaje de error
+    end
+    if game.not_turn_player?(session[:id])
+      status 403
+      #      mensaje de error
+    end
+    if params[:attack] == nil
+      status 400
+      #      mensaje de error
+    end
+    ship= game.enemy_ship(session[:id],params[:attack].to_s)
     #   Se actualiza el barco como atacado para luego mostrar en el mapa.
     if ship.empty?
-      Attack.new.create_attack(session[:id], params[:id_game], params[:attack].to_s, "miss")
+      game.create_attack(session[:id], params[:attack].to_s, "miss")
     else
-      Attack.new.create_attack(session[:id], params[:id_game], params[:attack].to_s, "throw")
-      Ship.ship_update(ship.last.id, 1)
+      game.create_attack(session[:id], params[:attack].to_s, "throw")
+      ship.last.is_attacked
     end  
     status 201
-    if enemy_ships_saved(params[:id_game], session[:id]).empty?
-      Game.update(params[:id_game],:turn => 0)
-      @message= "Has ganado!"
-      erb :"/game/game_over"
-    else
+    if game.enemy_ships_saved?(session[:id])     
       idPlayer= session[:id].to_s
-      Game.update(params[:id_game],:turn => session[:id])
-      redirect '/players/'+ idPlayer +'/games/' + params[:id_game] 
+      game.update_turn(session[:id])
+      redirect '/players/'+ idPlayer +'/games/' + params[:id_game]
+    else
+      game.update_turn(0)
+      @message= "Has ganado!"
+      erb :"/game/game_over", :layout => :layout
     end
   end
   
   get '/esperar/:id/games/:id_game' do
-    @game= Game.find_by_id(params[:id_game])
-    if @game.turn == session[:id]
+    game= Game.find_by id:(params[:id_game])
+    if game.wait_enemy?(session[:id])
       sleep 1
     end
     idPlayer= session[:id].to_s

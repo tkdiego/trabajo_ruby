@@ -7,7 +7,7 @@ class Game< ActiveRecord::Base
   
   has_many :ships, dependent: :destroy
   has_many :attacks,  dependent: :destroy
-  
+   
   def create_game (id_creator, id_opponent, table, turn)
     self.id_creator=id_creator
     self.id_opponent=id_opponent
@@ -22,13 +22,13 @@ class Game< ActiveRecord::Base
   end
 
   def create_ships(player_id, position_ships)
-  	for ship in position_ships
-   		ships.create(:player_id => player_id, :position => ship[1].to_s, :attacked => 0)
+    for ship in position_ships
+      ships.create(:player_id => player_id, :position => ship[1].to_s, :attacked => 0)
     end
   end
 
   def update_players_ready (num)
-  	update(:players_ready => num)
+    update(:players_ready => num)
   end
 
   def exist_game_between(creator, opponent)
@@ -73,8 +73,24 @@ class Game< ActiveRecord::Base
     ships.where(player_id:player_id).length == 0
   end
   
-  def turn_player?()
-    
+  def not_turn_player?(player_id)
+    self.turn == player_id
+  end
+  
+  def enemy_ship(player, attack)
+    ships.where.not(player_id:player).where(position:attack)
+  end
+  
+  def create_attack(player_id, attack,state)
+    attacks.create(:player_id => player_id, :position => attack, :state => state)
   end
 
+  def enemy_ships_saved?(player_id)
+    ships.where.not(player_id:player_id).where(attacked:0).length > 0
+  end
+  
+  def update_turn(num)
+    self.update(:turn => num) 
+  end
+  
 end

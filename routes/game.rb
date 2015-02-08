@@ -46,7 +46,7 @@ class Server < Sinatra::Base
   get '/players/:id/games/:id_game' do
     session_enable
     @game= Game.find_by_id(params[:id_game])
-    if @game.game_not_exist?(session[:id])
+    if @game.game_not_exist_for_player?(session[:id])
       status 400
 #      hacer un mensaje de que no existe
     end

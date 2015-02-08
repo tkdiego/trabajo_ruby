@@ -69,7 +69,7 @@ class Game< ActiveRecord::Base
     self.turn == player_id or self.players_ready != 2
   end
   
-  def game_not_exist? (player_id)
+  def game_not_exist_for_player? (player_id)
     self.id_creator == player_id or self.id_opponent == player_id
   end
   

@@ -7,7 +7,8 @@ class Game< ActiveRecord::Base
   
   has_many :ships, dependent: :destroy
   has_many :attacks,  dependent: :destroy
-  
+  #has_one :id_opponent, :class_name => 'Player', :foreign_key => 'id_opponent'
+  #has_one :id_creator, :class_name => 'Player', :foreign_key => 'id_creator'
   def create_game (id_creator, id_opponent, table, turn)
     self.id_creator=id_creator
     self.id_opponent=id_opponent
@@ -54,7 +55,7 @@ class Game< ActiveRecord::Base
   
   def bring_ships(player_id)
     ships.where(player_id:player_id)
-    
+
   end
   
   def bring_attacks(player_id)

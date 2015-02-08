@@ -13,21 +13,20 @@ class Server < Sinatra::Base
       erb :"player/list"
     else
       @game.create_game(session[:id], opponent.id, params[:table], opponent.id)
-      @ships_remaining=@game.ships_remaining(@game.table)
       status 201
       erb :"game/select_positions"
     end
   end
     
-  # -------- Tabla de barcos --------
+  # -------- Seleccionar posicion de los barcos --------
   get '/players/games/:id_game' do
     session_enable
+    @game=Game.find_by_id(params[:id_game])
     if @game.game_not_exist_for_player?(session[:id])
       status 400
 #      hacer un mensaje de que no existe
     end
-    @game=Game.find_by_id(params[:id_game])
-    ships_remaining#VA EN EL MODELO
+    @ships_remaining=@game.ships_remaining(@game.table)
     erb :"game/select_positions"
   end
 
@@ -49,7 +48,7 @@ class Server < Sinatra::Base
   get '/players/:id/games/:id_game' do
     session_enable
     @game= Game.find_by_id(params[:id_game])
-    if @game.game_not_exist?(session[:id])
+    if @game.game_not_exist_for_player?(session[:id])
       status 400
 #      hacer un mensaje de que no existe
     end

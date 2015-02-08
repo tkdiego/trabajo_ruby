@@ -42,24 +42,27 @@ class Server < Sinatra::Base
   # -------- Ver una partida --------
   get '/players/:id/games/:id_game' do
     session_enable
-    game_exist
     @game= Game.find_by_id(params[:id_game])
-    if (@game.ships.exist_ships?(session[:id]))
+    if @game.game_not_exist?(session[:id])
+      status 400
+#      hacer un mensaje de que no existe
+    end
+    if (@game.exist_ships?(session[:id]))
       redirect '/players/games/'+ params[:id_game]
     end
-    if @game.turn == 0
+    if @game.game_over?
       @game.destroy_game_complete
       @message = 'Has perdido!'
       erb :"/game/game_over"
     else
-      @ships=Ship.where(game_id:params[:id_game],player_id:session[:id])
-      @enemy_attacks= Attack.where(game_id:params[:id_game],player_id:session[:id])
-      if @game.turn == session[:id] or @game.players_ready != 2
+      @ships = @game.bring_ships(session[:id])
+      @enemy_attacks = @game.bring_attacks(session[:id])
+      if @game.wait_enemy?(session[:id])
         sleep 1.5
         @turn_player = "Enemigo"
         erb :"game/wait_turn"
       else
-        @turn_player = session[:username]
+        @turn_player = Player.find_by id:(session[:id])
         erb :"game/show_game"
       end 
     end  
@@ -89,9 +92,9 @@ class Server < Sinatra::Base
     ship= Ship.where("ships.game_id == #{params[:id_game]} AND ships.player_id != #{session[:id]} AND ships.position == '#{params[:attack].to_s}'")
     #   Se actualiza el barco como atacado para luego mostrar en el mapa.
     if ship.empty?
-      Attack.create_attack(session[:id], params[:id_game], params[:attack].to_s, "miss")
+      Attack.new.create_attack(session[:id], params[:id_game], params[:attack].to_s, "miss")
     else
-      Attack.create_attack(session[:id], params[:id_game], params[:attack].to_s, "throw")
+      Attack.new.create_attack(session[:id], params[:id_game], params[:attack].to_s, "throw")
       Ship.ship_update(ship.last.id, 1)
     end  
     status 201

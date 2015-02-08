@@ -1,17 +1,18 @@
 require 'sinatra/activerecord'
 class Game< ActiveRecord::Base
-  validates :id_creator, presence: true
-  validates :id_opponent, presence: true
+  validates :creator_id, presence: true
+  validates :opponent_id, presence: true
   validates :table, presence: true
   validates :turn, presence: true
   
   has_many :ships, dependent: :destroy
   has_many :attacks,  dependent: :destroy
-  #has_one :id_opponent, :class_name => 'Player', :foreign_key => 'id_opponent'
-  #has_one :id_creator, :class_name => 'Player', :foreign_key => 'id_creator'
-  def create_game (id_creator, id_opponent, table, turn)
-    self.id_creator=id_creator
-    self.id_opponent=id_opponent
+  has_one :opponent, :class_name => 'Player'#, :foreign_key => 'opponent'
+  has_one :creator, :class_name => 'Player'#, :foreign_key => 'creator'
+
+  def create_game (creator_id, opponent_id, table, turn)
+    self.creator_id=creator_id
+    self.opponent_id=opponent_id
     self.table=table 
     self.turn=turn 
     self.players_ready=0
@@ -33,8 +34,8 @@ class Game< ActiveRecord::Base
   end
 
   def exist_game_between(creator, opponent)
-    games_as_creator= Game.where(id_opponent:opponent.id, id_creator:creator.id)
-    games_as_opponent= Game.where(id_opponent:creator.id, id_creator:opponent.id)
+    games_as_creator= Game.where(opponent_id:opponent.id, creator_id:creator.id)
+    games_as_opponent= Game.where(opponent_id:creator.id, creator_id:opponent.id)
     return !(games_as_creator.empty? && games_as_opponent.empty?)
   end
 
@@ -67,7 +68,7 @@ class Game< ActiveRecord::Base
   end
   
   def game_not_exist_for_player? (player_id)
-    self.id_creator == player_id or self.id_opponent == player_id
+    self.creator_id == player_id or self.opponent_id == player_id
   end
   
   def exist_ships?(player_id)

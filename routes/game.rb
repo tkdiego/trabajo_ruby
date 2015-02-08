@@ -1,6 +1,12 @@
 class Server < Sinatra::Base
 	use Rack::MethodOverride 
 
+
+  get '/prueba/:id' do
+    p=Player.find_by id: (params[:id]) 
+
+    p.games_opponent.to_json
+  end
   # -------- Crear una partida --------
   post '/players/games' do
     session_enable
@@ -77,14 +83,14 @@ class Server < Sinatra::Base
   get '/players/:player_id/games' do
     session_enable
     @list_games=[]
-    games= Game.select("games.id_opponent, games.id").joins("INNER JOIN players on games.id_creator = players.id").where("players.id == #{session[:id]} and games.id_opponent != #{session[:id]}")
+    games=(Player.find_by id:(session[:id])).get_games_as_creator
     for game in games
-      player = Player.find_by_id(game.id_opponent)
+      player = Player.find_by_id(game.opponent_id)
       @list_games << [player.username, game.id]
     end
-    games= Game.select("games.id_creator, games.id").joins("INNER JOIN players on games.id_opponent = players.id").where("players.id == #{session[:id]} and games.id_creator != #{session[:id]}")
+    games=(Player.find_by id:(session[:id])).get_games_as_opponent
     for game in games
-      player = Player.find_by_id(game.id_creator)
+      player = Player.find_by_id(game.creator_id)
       @list_games << [player.username, game.id]
     end
     erb :"/game/list_games"

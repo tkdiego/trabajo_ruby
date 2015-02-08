@@ -15,4 +15,15 @@ class Game< ActiveRecord::Base
   def destroy_game_complete
     self.destroy
   end
+
+  def create_ships(player_id, position_ships)
+  	for ship in position_ships
+   		ships.create(:player_id => player_id, :position => ship[1].to_s, :attacked => 0)
+    end
+  end
+
+  def update_players_ready (num)
+  	update(:players_ready => num)
+  end
+  
 end

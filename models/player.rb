@@ -7,13 +7,13 @@ class Player< ActiveRecord::Base
   has_many :attacks, through: :games
 
   def authenticate(username, password)
-   !(Player.where(username: username, password: password).first).nil?
+  	(Player.where(username: username, password: password).first).instance_of?(Player)
   end
 
   def exist?(username)
     !(Player.where username: username).empty?
   end
-  
+
   def find_player(enemy)
     Player.find_by_username(enemy)
   end

@@ -22,7 +22,10 @@ class Server < Sinatra::Base
   # -------- Tabla de barcos --------
   get '/players/games/:id_game' do
     session_enable
-    game_exist #PARA QUE SIRVE?
+    if @game.game_not_exist_for_player?(session[:id])
+      status 400
+#      hacer un mensaje de que no existe
+    end
     @game=Game.find_by_id(params[:id_game])
     ships_remaining#VA EN EL MODELO
     erb :"game/select_positions"
@@ -31,12 +34,12 @@ class Server < Sinatra::Base
   # -------- Creacion de los barcos --------
   put '/players/:id/game/:id_game' do
     session_enable
+    game = Game.find_by id: params[:id_game]
     game_exist
     if params[:left_ships].to_i != 0
       redirect '/players/games/'+params[:id_game]
     end
     @ships_positions=params.select{|h| h!='_method' && h!= 'splat' && h!= 'id' && h!= 'id_game' && h!= 'captures' && h!= 'left_ships'}
-    game = Game.find_by id: params[:id_game]
     game.create_ships(session[:id], @ships_positions)
     game.update_players_ready(game.players_ready + 1)
     redirect '/players/'+ params[:id]+'/games/'+params[:id_game]
@@ -46,7 +49,7 @@ class Server < Sinatra::Base
   get '/players/:id/games/:id_game' do
     session_enable
     @game= Game.find_by_id(params[:id_game])
-    if @game.game_not_exist_for_player?(session[:id])
+    if @game.game_not_exist?(session[:id])
       status 400
 #      hacer un mensaje de que no existe
     end

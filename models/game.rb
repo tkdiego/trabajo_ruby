@@ -10,6 +10,9 @@ class Game< ActiveRecord::Base
   
   def create_game (id_creator, id_opponent, table, turn)
     Game.create(:id_creator => id_creator, :id_opponent => id_opponent, :table => table, :turn => turn, :players_ready => 0)
-    
+  end
+  
+  def destroy_game_complete
+    self.destroy
   end
 end

@@ -46,12 +46,12 @@ class Server < Sinatra::Base
   get '/players/:id/games/:id_game' do
     session_enable
     game_exist
-    if (Ship.where(game_id:params[:id_game],player_id:session[:id])).empty?
+    @game= Game.find_by_id(params[:id_game])
+    if (@game.ships.exist_ships?(session[:id]))
       redirect '/players/games/'+ params[:id_game]
     end
-    @game= Game.find_by_id(params[:id_game])
     if @game.turn == 0
-      destroy_game_complete
+      @game.destroy_game_complete
       @message = 'Has perdido!'
       erb :"/game/game_over"
     else

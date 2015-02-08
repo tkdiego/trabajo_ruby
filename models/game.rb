@@ -16,6 +16,10 @@ class Game< ActiveRecord::Base
     self.players_ready=0
     self.save  
   end
+  
+  def destroy_game_complete
+    self.destroy
+  end
 
   def create_ships(player_id, position_ships)
   	for ship in position_ships
@@ -26,6 +30,7 @@ class Game< ActiveRecord::Base
   def update_players_ready (num)
   	update(:players_ready => num)
   end
+
 
   def exist_game_between(creator, opponent)
     games_as_creator= Game.where(id_opponent:opponent.id, id_creator:creator.id)

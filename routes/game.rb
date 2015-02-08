@@ -4,24 +4,27 @@ class Server < Sinatra::Base
   # -------- Crear una partida --------
   post '/players/games' do
     session_enable
-    opponent=Player.new.find_player(params[:opponent])
-    if params[:table].nil? || opponent.nil?  
-      halt 400, "Seleccione tabla y oponente" 
+    opponent=Player.find_by username:(params[:opponent])
+    creator= Player.find_by id:(session[:id])
+    @game=Game.new
+    if @game.exist_game_between(creator, opponent)
+      @message="Ya ha iniciado una partida con el rival seleccionado"
+      @list_players = Player.where.not(id: session[:id])
+      erb :"player/list"
     else
-      exist_game_with (opponent)
-		  @game= Game.new.create_game(session[:id], opponent.id,params[:table], opponent.id)
+      @game.create_game(session[:id], opponent.id, params[:table], opponent.id)
+      @ships_remaining=@game.ships_remaining(@game.table)
       status 201
-      ships_remaining
-		  erb :"game/select_positions"
+      erb :"game/select_positions"
     end
   end
     
   # -------- Tabla de barcos --------
   get '/players/games/:id_game' do
     session_enable
-    game_exist
+    game_exist #PARA QUE SIRVE?
     @game=Game.find_by_id(params[:id_game])
-    ships_remaining
+    ships_remaining#VA EN EL MODELO
     erb :"game/select_positions"
   end
 

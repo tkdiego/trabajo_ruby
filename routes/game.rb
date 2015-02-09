@@ -61,7 +61,7 @@ class Server < Sinatra::Base
       @msj_url= "Volver al menu"
       erb :error, :layout => :layout
     end
-    if (@game.exist_ships?(session[:id]))
+    if (@game.not_exist_ships?(session[:id]))
       redirect '/players/games/'+ params[:id_game]
     end
     if @game.game_over?

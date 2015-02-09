@@ -67,10 +67,10 @@ class Game< ActiveRecord::Base
   end
   
   def game_not_exist_for_player? (player_id)
-    self.creator_id == player_id or self.opponent_id == player_id
+    self.creator_id != player_id or self.opponent_id != player_id
   end
   
-  def exist_ships?(player_id)
+  def not_exist_ships?(player_id)
     ships.where(player_id:player_id).length == 0
   end
   

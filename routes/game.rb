@@ -10,6 +10,7 @@ class Server < Sinatra::Base
     if @game.exist_game_between(creator, opponent)
       @message="Ya ha iniciado una partida con el rival seleccionado"
       @list_players = Player.where.not(id: session[:id])
+      status 409
       erb :"player/list", :layout => :layout
     else
       @game.create_game(session[:id], opponent.id, params[:table], opponent.id)
@@ -34,7 +35,10 @@ class Server < Sinatra::Base
   put '/players/:id/game/:id_game' do
     session_enable
     game = Game.find_by id: params[:id_game]
-    game_exist
+    if game.game_not_exist_for_player?(session[:id])
+      status 400
+      #      hacer un mensaje de que no existe
+    end
     if params[:left_ships].to_i != 0
       redirect '/players/games/'+params[:id_game]
     end

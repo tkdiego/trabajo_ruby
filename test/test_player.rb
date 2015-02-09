@@ -3,7 +3,6 @@ require './server'
 require 'minitest/autorun'
 require 'rack/test'
 require 'database_cleaner'
-
 DatabaseCleaner.strategy = :transaction
 
 class TestPlayer < MiniTest::Test
@@ -13,9 +12,13 @@ class TestPlayer < MiniTest::Test
   def app
     Server
   end
-  
-  def test_db_start
+
+  def setup
     DatabaseCleaner.start
+  end
+
+  def teardown
+    DatabaseCleaner.clean
   end
 
   def create_valid_user
@@ -56,10 +59,6 @@ class TestPlayer < MiniTest::Test
   def test_list_players
     get '/players/1/games',{}, 'rack.session' => { :id => 1, :username => "user", :enable => true }
     assert_equal 200, last_response.status
-  end
-  
-  def test_db_clean
-    DatabaseCleaner.clean
   end
   
 end

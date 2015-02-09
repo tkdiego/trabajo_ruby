@@ -1,15 +1,24 @@
-require_relative 'test_game'
-require_relative 'test_player'
+ENV['RACK_ENV'] = 'test'
+
+require './server'
+require 'minitest/autorun'
+require 'rack/test'
+require 'database_cleaner'
+
 DatabaseCleaner.strategy = :transaction
 
-set :test, File.dirname("./test/**")
-
 class MiniTest::Test
-  before :test do
-    DatabaseCleaner.start
-  end
+	 def setup
+		DatabaseCleaner.clean
+		DatabaseCleaner.start
+	end
 
-  after :test do
-    DatabaseCleaner.clean
-  end
+	def teardown
+		DatabaseCleaner.clean
+	end
+
+end
+
+Dir["./test/**"].each do |t|
+  require t
 end

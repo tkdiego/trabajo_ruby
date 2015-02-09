@@ -18,10 +18,10 @@ class Server < Sinatra::Base
     else
       if new_player.exist?(new_player.username)
         status 409
-        @message="El usuario ya existe"
+        @message="El usuario ya existe. Error 409"
       else
         status 400
-        @message="Usuario o contraseña invalidos"  
+        @message="Usuario o contraseña invalidos. Error 400"  
       end
       erb :"player/sign_in", :layout => :layout
     end     
@@ -53,7 +53,7 @@ class Server < Sinatra::Base
       erb :"player/menu", :layout => :layout
 	  else
       status 401
-      @message="Usuario o contraseña invalidos"
+      @message="Usuario o contraseña invalidos. Error 401"
       erb :"player/login", :layout => :layout
 	  end
   end

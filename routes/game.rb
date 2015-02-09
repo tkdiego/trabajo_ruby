@@ -25,7 +25,10 @@ class Server < Sinatra::Base
     @game=Game.find_by_id(params[:id_game])
     if @game.game_not_exist_for_player?(session[:id])
       status 400
-      #      hacer un mensaje de que no existe
+      @message= "400, Bad request: No participa en la partida"
+      @url= '/'
+      @msj_url= "Volver al menu"
+      erb :error, :layout => :layout
     end
     @ships_remaining= @game.ships_remaining(@game.table)
     erb :"game/select_positions",:layout => :layout
@@ -53,8 +56,10 @@ class Server < Sinatra::Base
     session_enable
     @game= Game.find_by_id(params[:id_game])
     if @game.game_not_exist_for_player?(session[:id])
-      status 400
-      #      hacer un mensaje de que no existe
+      @message= "400, Bad request: No participa en la partida"
+      @url= '/'
+      @msj_url= "Volver al menu"
+      erb :error, :layout => :layout
     end
     if (@game.exist_ships?(session[:id]))
       redirect '/players/games/'+ params[:id_game]
@@ -100,18 +105,26 @@ class Server < Sinatra::Base
     game = Game.find_by id: params[:id_game]
     if game.game_not_exist_for_player?(session[:id])
       status 400
-      #    mensaje de error
+      @message= "400, Bad request: No participa en la partida"
+      @url= '/'
+      @msj_url= "Volver al menu"
+      erb :error, :layout => :layout
     end
     if game.not_turn_player?(session[:id])
       status 403
-      #      mensaje de error
+      @message= "400 Forbidden: Turno del rival."
+      @url= '/players'+ session[:id]+'/games'+ params[:id_game]
+      @msj_url= "Volver"
+      erb :error, :layout => :layout
     end
     if params[:attack] == nil
       status 400
-      #      mensaje de error
+      @message= "400 Bad request: No se ha especificado el ataque."
+      @url= '/players'+ session[:id]+'/games'+ params[:id_game]
+      @msj_url= "Volver"
+      erb :error, :layout => :layout
     end
     ship= game.enemy_ship(session[:id],params[:attack].to_s)
-    #   Se actualiza el barco como atacado para luego mostrar en el mapa.
     if ship.empty?
       game.create_attack(session[:id], params[:attack].to_s, "miss")
     else

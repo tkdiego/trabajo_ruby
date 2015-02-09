@@ -56,7 +56,6 @@ class Game< ActiveRecord::Base
   
   def bring_ships(player_id)
     ships.where(player_id:player_id)
-
   end
   
   def bring_attacks(player_id)

@@ -30,7 +30,7 @@ class Server < Sinatra::Base
       @msj_url= "Volver al menu"
       erb :error, :layout => :layout
     end
-    @ships_remaining= @game.ships_remaining(@game.table)
+    @ships_remaining= @game.ships_remaining
     erb :"game/select_positions",:layout => :layout
   end
 

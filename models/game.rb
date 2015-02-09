@@ -34,8 +34,8 @@ class Game< ActiveRecord::Base
   end
 
   def exist_game_between(creator, opponent)
-    games_as_creator= Game.where(opponent_id:opponent.id, creator_id:creator.id)
-    games_as_opponent= Game.where(opponent_id:creator.id, creator_id:opponent.id)
+    games_as_creator= Game.where(opponent_id:opponent, creator_id:creator)
+    games_as_opponent= Game.where(opponent_id:creator, creator_id:opponent)
     return !(games_as_creator.empty? && games_as_opponent.empty?)
   end
 

@@ -7,7 +7,7 @@ class Server < Sinatra::Base
     opponent=Player.find_by username:(params[:opponent])
     creator= Player.find_by id:(session[:id])
     @game=Game.new
-    if @game.exist_game_between(creator, opponent)
+    if @game.exist_game_between(creator.id, opponent.id)
       @message="Ya ha iniciado una partida con el rival seleccionado"
       @list_players = Player.where.not(id: session[:id])
       status 409

@@ -8,8 +8,8 @@ require 'database_cleaner'
 DatabaseCleaner.strategy = :transaction
 
 class MiniTest::Test
-	 def setup
-		DatabaseCleaner.clean
+
+	def setup		
 		DatabaseCleaner.start
 	end
 
@@ -18,6 +18,8 @@ class MiniTest::Test
 	end
 
 end
+
+
 
 Dir["./test/**"].each do |t|
   require t

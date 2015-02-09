@@ -1,10 +1,3 @@
-ENV['RACK_ENV'] = 'test'
-require './server'
-require 'minitest/autorun'
-require 'rack/test'
-require 'database_cleaner'
-DatabaseCleaner.strategy = :transaction
-
 class TestPlayer < MiniTest::Test
 
   include Rack::Test::Methods
@@ -13,16 +6,8 @@ class TestPlayer < MiniTest::Test
     Server
   end
 
-  def setup
-    DatabaseCleaner.start
-  end
-
-  def teardown
-    DatabaseCleaner.clean
-  end
-
-  def create_valid_user
-    Player.create(:username => 'user',:password => 'user')
+  def create_user
+     Player.create(:username => 'user',:password => 'user')
   end
 
   def test_valid_sign_in
@@ -38,15 +23,15 @@ class TestPlayer < MiniTest::Test
   end
 
   def test_user_exist_sign_in
-    create_valid_user
-    post '/player', :username => 'user', :password => 'user'
+    user=create_user
+    post '/player', :username => user.username, :password => user.password
     assert_equal 409, last_response.status
     assert last_response.body.include?("El usuario ya existe")
   end
 
   def test_valid_login
-    create_valid_user
-    post '/login',:username => 'user', :password => 'user'
+    user=create_user
+    post '/login',:username => user.username, :password => user.password
     assert_equal 200, last_response.status
   end
 
@@ -57,7 +42,8 @@ class TestPlayer < MiniTest::Test
   end
   
   def test_list_players
-    get '/players/1/games',{}, 'rack.session' => { :id => 1, :username => "user", :enable => true }
+    user=create_user
+    get '/players/'+user.id.to_s,{}, 'rack.session' => { :id => user.id, :enable => true }
     assert_equal 200, last_response.status
   end
   

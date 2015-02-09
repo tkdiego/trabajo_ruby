@@ -39,8 +39,8 @@ class Game< ActiveRecord::Base
     return !(games_as_creator.empty? && games_as_opponent.empty?)
   end
 
-  def ships_remaining (table_size)
-    case table_size
+  def ships_remaining
+    case self.table
     when 5
       7
     when 10

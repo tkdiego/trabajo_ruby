@@ -121,7 +121,6 @@ class Server < Sinatra::Base
       erb :error, :layout => :layout
     end
     ship= game.enemy_ship(session[:id],params[:attack].to_s)
-    #   Se actualiza el barco como atacado para luego mostrar en el mapa.
     if ship.empty?
       game.create_attack(session[:id], params[:attack].to_s, "miss")
     else

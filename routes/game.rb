@@ -23,7 +23,7 @@ class Server < Sinatra::Base
   get '/players/games/:id_game' do
     session_enable
     @game=Game.find_by_id(params[:id_game])
-    if @game.game_not_exist_for_player?(session[:id])
+    if @game.game_not_exist_for_player(session[:id])
       status 400
       @message= "400, Bad request: No participa en la partida"
       @url= '/'

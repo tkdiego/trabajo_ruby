@@ -154,4 +154,75 @@ class TestModelGame < MiniTest::Test
     assert_raises (ArgumentError) {game.not_exist_ships?}
   end
   
+  def test_valid_not_turn_player
+    game = Game.new
+    game.create_game(1,2,5,2)
+    assert game.not_turn_player?(2)
+  end
+  
+  def test_invalid_not_turn_player
+    game = Game.new
+    game.create_game(1,2,5,2)
+    assert_raises (ArgumentError) {game.not_turn_player?}
+  end
+  
+  def test_valid_enemy_ship
+    ships = [[:"0:0","0:0"], [:"0:1" , "0:1"],[ :"0:2" , "0:2"], [:"0:3" , "0:3"],[ :"0:4", "0:4"],[ :"1:0", "1:0"],[ :"2:0", "2:0"]]
+    game = Game.new
+    game.create_game(1,2,5,2)
+    game.create_ships(1,ships)
+    assert game.enemy_ship(2,"0:0").length == 1
+  end
+  
+  def test_invalid_enemy_ship
+    ships = [[:"0:0","0:0"], [:"0:1" , "0:1"],[ :"0:2" , "0:2"], [:"0:3" , "0:3"],[ :"0:4", "0:4"],[ :"1:0", "1:0"],[ :"2:0", "2:0"]]
+    game = Game.new
+    game.create_game(1,2,5,2)
+    game.create_ships(1,ships)
+    assert_raises (ArgumentError) {game.enemy_ship("0:0").length == 1}
+  end
+    
+  def test_valid_model_create_attack
+    game = Game.new
+    game.create_game(1,2,5,2)
+    attack= game.create_attack(1,"0:0","miss")
+    attack_db = Attack.find_by id:(attack.id)
+    assert attack == attack_db
+  end
+  
+  def test_invalid_model_create_attack
+    game = Game.new
+    game.create_game(1,2,5,2)
+    assert_raises (ArgumentError) {game.create_attack(1,"miss")}
+  end
+  
+  def test_valid_enemy_ships_saved
+    ships = [[:"0:0","0:0"], [:"0:1" , "0:1"],[ :"0:2" , "0:2"], [:"0:3" , "0:3"],[ :"0:4", "0:4"],[ :"1:0", "1:0"],[ :"2:0", "2:0"]]
+    game = Game.new
+    game.create_game(1,2,5,2)
+    game.create_ships(1,ships)
+    assert game.enemy_ships_saved?(2)
+  end
+  
+  def test_invalid_enemy_ships_saved
+    ships = [[:"0:0","0:0"], [:"0:1" , "0:1"],[ :"0:2" , "0:2"], [:"0:3" , "0:3"],[ :"0:4", "0:4"],[ :"1:0", "1:0"],[ :"2:0", "2:0"]]
+    game = Game.new
+    game.create_game(1,2,5,2)
+    game.create_ships(1,ships)
+    assert_raises (ArgumentError) {game.enemy_ships_saved?}
+  end
+  
+  def test_valid_update_turn
+    game = Game.new
+    game.create_game(1,2,5,2)
+    game.update_turn(1)
+    assert game.turn == 1
+  end
+  
+  def test_invalid_update_turn
+    game = Game.new
+    game.create_game(1,2,5,2)
+    assert_raises (ArgumentError) {game.update_turn}
+  end
+  
 end

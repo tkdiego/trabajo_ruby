@@ -32,25 +32,30 @@ class Server < Sinatra::Base
   get '/players/games/:id_game' do
     session_enable
     @game=Game.find_by_id(params[:id_game])
-    if !(@game.nil?) || @game.game_exist_for_player?(session[:id])
-      @ships_remaining= @game.ships_remaining
-      @ships_remaining.to_json
-      erb :"game/select_positions",:layout => :layout
-    else
+    if @game.nil? || !(@game.game_exist_for_player?(session[:id]))
       status 400
       @message= "400, Bad request: No participa en la partida"
       @url= '/'
       @msj_url= "Volver al menu"
       erb :error, :layout => :layout
+    else
+      @ships_remaining= @game.ships_remaining
+      @ships_remaining.to_json
+      erb :"game/select_positions",:layout => :layout
     end
   end
-
 
   # -------- Creacion de los barcos --------
   put '/players/:id/game/:id_game' do
     session_enable
     game = Game.find_by id: params[:id_game]
-    if !(@game.nil?) || @game.game_exist_for_player?(session[:id])
+    if @game.nil? || !(@game.game_exist_for_player?(session[:id]))
+      status 400
+      @message= "400, Bad request: No participa en la partida"
+      @url= '/'
+      @msj_url= "Volver al menu"
+      erb :error, :layout => :layout
+    else
       if params[:left_ships].to_i != 0
         redirect '/players/games/'+params[:id_game]
       end
@@ -58,12 +63,6 @@ class Server < Sinatra::Base
       game.create_ships(session[:id], @ships_positions)
       game.update_players_ready(game.players_ready + 1)
       redirect '/players/'+ params[:id]+'/games/'+params[:id_game]
-    else
-      status 400
-      @message= "400, Bad request: No participa en la partida"
-      @url= '/'
-      @msj_url= "Volver al menu"
-      erb :error, :layout => :layout
     end
   end
 
@@ -71,7 +70,12 @@ class Server < Sinatra::Base
   get '/players/:id/games/:id_game' do
     session_enable
     @game= Game.find_by id:(params[:id_game])
-    if !(@game.nil?) || @game.game_exist_for_player?(session[:id])
+    if @game.nil? || !(@game.game_exist_for_player?(session[:id]))
+      @message= "400, Bad request: No participa en la partida"
+      @url= '/'
+      @msj_url= "Volver al menu"
+      erb :error, :layout => :layout
+    else
       if (@game.not_exist_ships?(session[:id]))
         redirect '/players/games/'+ params[:id_game]
       end
@@ -91,11 +95,6 @@ class Server < Sinatra::Base
           erb :"game/show_game", :layout => :layout
         end 
       end  
-    else
-      @message= "400, Bad request: No participa en la partida"
-      @url= '/'
-      @msj_url= "Volver al menu"
-      erb :error, :layout => :layout
     end   
   end
   

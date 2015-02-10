@@ -7,8 +7,8 @@ class Game< ActiveRecord::Base
   
   has_many :ships, dependent: :destroy
   has_many :attacks,  dependent: :destroy
-  has_one :opponent, :class_name => 'Player'#, :foreign_key => 'opponent'
-  has_one :creator, :class_name => 'Player'#, :foreign_key => 'creator'
+  has_one :opponent, :class_name => 'Player'
+  has_one :creator, :class_name => 'Player'
 
   def create_game (creator_id, opponent_id, table, turn)
     self.creator_id=creator_id
@@ -36,7 +36,7 @@ class Game< ActiveRecord::Base
   def exist_game_between(creator, opponent)
     games_as_creator= Game.where(opponent_id:opponent, creator_id:creator)
     games_as_opponent= Game.where(opponent_id:creator, creator_id:opponent)
-    return !(games_as_creator.empty? && games_as_opponent.empty?)
+    !(games_as_creator.empty? && games_as_opponent.empty?)
   end
 
   def ships_remaining
@@ -66,8 +66,8 @@ class Game< ActiveRecord::Base
     self.turn == player_id or self.players_ready != 2
   end
   
-  def game_not_exist_for_player? (player_id)
-    self.creator_id != player_id or self.opponent_id != player_id
+  def game_exist_for_player? (player_id)
+    self.creator_id == player_id or self.opponent_id == player_id
   end
   
   def not_exist_ships?(player_id)

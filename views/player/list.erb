@@ -1,27 +1,27 @@
-        <div class="container">
-            <header class="sixteen columns">
-                <div id="logo">
-                    <h1>Batalla naval</h1>
-                    <h2>Usuario: <%= session[:username] %> | <a href="/logout"> Logout </a> </h2> 
-                </div>
-            </header>
-            <div id="overview">
-                <a href="/"> Volver al menu </a>
-                <hr />
-            </div>
-            <div id="columna_central" >
-                <h3> <br> <%= @message %> </br></h3>
-                <h3> Selecciona a tu rival: </h3>
-                <form name="formu" method="post" action="/players/games" onsubmit="return check_create_game()">
-                    <menu>
-                        <% for p in @list_players %>
-                          <ul><input type="radio" name="opponent" value="<%= p.username %>"><%= p.username %></ul>
-                        <% end %>
-                    </menu>
-                    <h3>Seleccione la dimension de la tabla: </h3>
-                    <input type="radio" name="table" value="5"/> 5 x 5
-                    <input type="radio" name="table" value="10"/> 10 x 10
-                    <input type="radio" name="table" value="15"/> 15 x 15     
-                    <input type="submit" value="Crear partida">
-                </form>
-            </div>
+<div class="container">
+  <header class="sixteen columns">
+    <div id="logo">
+      <h1>Batalla naval</h1>
+      <h2>Usuario: <%= session[:username] %> | <a href="/logout"> Logout </a> </h2> 
+    </div>
+  </header>
+  <div id="overview">
+    <a href="/"> Volver al menu </a>
+    <hr />
+  </div>
+  <div id="columna_central" >
+    <h3> <br> <%= @message %> </br></h3>
+    <h3> Selecciona a tu rival: </h3>
+    <form name="formu" method="post" action="/players/games" onsubmit="return check_create_game()">
+      <menu>
+        <% for p in @list_players %>
+        <ul><input type="radio" id="opponent" name="opponent"  value="<%= p.username %>"><%= p.username %></ul>
+        <% end %>
+      </menu>
+      <h3>Seleccione la dimension de la tabla: </h3>
+      <input type="radio" name="table" id="table" value="5"/> 5 x 5
+      <input type="radio" name="table"  id="table"value="10"/> 10 x 10
+      <input type="radio" name="table" id="table" value="15"/> 15 x 15     
+      <input type="submit" value="Crear partida">
+    </form>
+  </div>

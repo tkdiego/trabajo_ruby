@@ -1,17 +1,17 @@
-        <div class="container">
-            <header class="sixteen columns">
-                <div id="logo">
-                    <h1>Batalla naval</h1>
-                    <h2>Usuario: <%= session[:username] %> | <a href="/logout"> Logout </a> </h2>
-                </div>
-            </header>
-            <div id="overview">
-                <h3>Menu</h3>
-                <hr />
-            </div>
-            <div id="columna_central" >
-                <h3>
-                <ul><a href="players"> Crear partida </a> </ul>
-                <ul><a href="/players/<%= session[:id]%>/games"> Listar partidas </a></ul>
-                </h3>
-            </div>
+<div class="container">
+    <header class="sixteen columns">
+        <div id="logo">
+            <h1>Batalla naval</h1>
+            <h2>Usuario: <%= session[:username] %> | <a href="/logout"> Logout </a> </h2>
+        </div>
+    </header>
+    <div id="overview">
+        <h3>Menu</h3>
+        <hr />
+    </div>
+    <div id="columna_central" >
+        <h3>
+            <ul><a href="players/<%= session[:id]%>"> Crear partida </a> </ul>
+            <ul><a href="/players/<%= session[:id]%>/games"> Listar partidas </a></ul>
+        </h3>
+    </div>

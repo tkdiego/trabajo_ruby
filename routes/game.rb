@@ -7,44 +7,49 @@ class Server < Sinatra::Base
     opponent=Player.find_by username:(params[:opponent])
     creator= Player.find_by id:(session[:id])
     @game=Game.new
-    if @game.exist_game_between(creator.id, opponent.id)
-      @message="Ya ha iniciado una partida con el rival seleccionado"
-      @list_players = Player.where.not(id: session[:id])
-      status 409
-      erb :"player/list", :layout => :layout
+    if params[:table].nil? || opponent.nil?
+      status 400
+      @message= "400, Bad request: Seleccione oponente y tamaño de tabla"
+      @url= '/'
+      @msj_url= "Volver al menu"
+      erb :error, :layout => :layout
     else
-      @game.create_game(session[:id], opponent.id, params[:table], opponent.id)
-      status 201
-      erb :"game/select_positions", :layout => :layout
+      if @game.exist_game_between(creator.id, opponent.id)
+        status 409
+        @message="Ya ha iniciado una partida con el rival seleccionado"
+        @list_players = Player.where.not(id: session[:id])
+        erb :"player/list", :layout => :layout
+      else
+        @game.create_game(session[:id], opponent.id, params[:table], opponent.id)
+        status 201
+        erb :"game/select_positions", :layout => :layout
+      end
     end
   end
-    
+  
   # -------- Seleccionar posicion de los barcos --------
   get '/players/games/:id_game' do
     session_enable
     @game=Game.find_by_id(params[:id_game])
-    if @game.game_not_exist_for_player(session[:id])
+    if @game.game_exist_for_player?(session[:id])
+      @ships_remaining= @game.ships_remaining
+      @ships_remaining.to_json
+      erb :"game/select_positions",:layout => :layout
+    else
       status 400
       @message= "400, Bad request: No participa en la partida"
       @url= '/'
       @msj_url= "Volver al menu"
       erb :error, :layout => :layout
     end
-    @ships_remaining= @game.ships_remaining
-    erb :"game/select_positions",:layout => :layout
   end
+
 
   # -------- Creacion de los barcos --------
   put '/players/:id/game/:id_game' do
     session_enable
     game = Game.find_by id: params[:id_game]
-    if game.game_not_exist_for_player?(session[:id])
-      status 400
-      @message= "400, Bad request: No participa en la partida"
-      @url= '/'
-      @msj_url= "Volver al menu"
-      erb :error, :layout => :layout
-    else
+    if game.game_exist_for_player?(session[:id])
       if params[:left_ships].to_i != 0
         redirect '/players/games/'+params[:id_game]
       end
@@ -52,19 +57,20 @@ class Server < Sinatra::Base
       game.create_ships(session[:id], @ships_positions)
       game.update_players_ready(game.players_ready + 1)
       redirect '/players/'+ params[:id]+'/games/'+params[:id_game]
+    else
+      status 400
+      @message= "400, Bad request: No participa en la partida"
+      @url= '/'
+      @msj_url= "Volver al menu"
+      erb :error, :layout => :layout
     end
   end
 
   # -------- Ver una partida --------
   get '/players/:id/games/:id_game' do
     session_enable
-    @game= Game.find_by_id(params[:id_game])
-    if @game.game_not_exist_for_player?(session[:id])
-      @message= "400, Bad request: No participa en la partida"
-      @url= '/'
-      @msj_url= "Volver al menu"
-      erb :error, :layout => :layout
-    else
+    @game= Game.find_by id:(params[:id_game])
+    if @game.game_exist_for_player?(session[:id])
       if (@game.not_exist_ships?(session[:id]))
         redirect '/players/games/'+ params[:id_game]
       end
@@ -84,8 +90,12 @@ class Server < Sinatra::Base
           erb :"game/show_game", :layout => :layout
         end 
       end  
-    end
-    
+    else
+      @message= "400, Bad request: No participa en la partida"
+      @url= '/'
+      @msj_url= "Volver al menu"
+      erb :error, :layout => :layout
+    end   
   end
   
   # -------- Listar partidas -------
@@ -109,7 +119,7 @@ class Server < Sinatra::Base
   post '/player/:player_id/games/:id_game/move' do
     session_enable
     game = Game.find_by id: params[:id_game]
-    if game.game_not_exist_for_player?(session[:id])
+    if !(game.game_exist_for_player?(session[:id]))
       status 400
       @message= "400, Bad request: No participa en la partida"
       @url= '/'
@@ -118,38 +128,41 @@ class Server < Sinatra::Base
     else
       if game.not_turn_player?(session[:id])
         status 403
-        @message= "400 Forbidden: Turno del rival."
-        @url= '/players'+ session[:id]+'/games'+ params[:id_game]
+        @message= "403 Forbidden: Turno del rival."
+        @url= '/players/#{session[:id]}/games/#{params[:id_game]}'
         @msj_url= "Volver"
         erb :error, :layout => :layout
       else
         if params[:attack] == nil
           status 400
           @message= "400 Bad request: No se ha especificado el ataque."
-          @url= '/players'+ session[:id]+'/games'+ params[:id_game]
+          @url= '/players/#{session[:id]}/games/#{params[:id_game]}'
           @msj_url= "Volver"
           erb :error, :layout => :layout
+        else
+          ship= game.enemy_ship(session[:id],params[:attack].to_s)
+          if ship.empty?
+            game.create_attack(session[:id], params[:attack].to_s, "miss")
+          else
+            game.create_attack(session[:id], params[:attack].to_s, "throw")
+            ship.last.is_attacked
+          end  
+          status 201
+          if game.enemy_ships_saved?(session[:id])     
+            idPlayer= session[:id].to_s
+            game.update_turn(session[:id])
+            redirect '/players/'+ idPlayer +'/games/' + params[:id_game]
+          else
+            game.update_turn(0)
+            @message= "Has ganado!"
+            erb :"/game/game_over", :layout => :layout
+          end
         end
       end
     end
-    ship= game.enemy_ship(session[:id],params[:attack].to_s)
-    if ship.empty?
-      game.create_attack(session[:id], params[:attack].to_s, "miss")
-    else
-      game.create_attack(session[:id], params[:attack].to_s, "throw")
-      ship.last.is_attacked
-    end  
-    status 201
-    if game.enemy_ships_saved?(session[:id])     
-      idPlayer= session[:id].to_s
-      game.update_turn(session[:id])
-      redirect '/players/'+ idPlayer +'/games/' + params[:id_game]
-    else
-      game.update_turn(0)
-      @message= "Has ganado!"
-      erb :"/game/game_over", :layout => :layout
-    end
+
   end
+  
   
   get '/esperar/:id/games/:id_game' do
     game= Game.find_by id:(params[:id_game])

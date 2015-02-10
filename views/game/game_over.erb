@@ -1,14 +1,14 @@
-        <div class="container">
-            <header class="sixteen columns">
-                <div id="logo">
-                    <h1>Batalla naval</h1>
-                   <h2>Usuario: <%= session[:username] %> | <a href="/logout"> Logout </a> </h2>
-                </div>
-            </header>
-            <div id="overview">
-                <a href="/"> Volver al menu </a>
-                <hr />
-            </div>
-            <div id="columna_central" >
-                <h1> <%= @message %>  </h1>
-            </div>
+<div class="container">
+    <header class="sixteen columns">
+        <div id="logo">
+            <h1>Batalla naval</h1>
+            <h2>Usuario: <%= session[:username] %> | <a href="/logout"> Logout </a> </h2>
+        </div>
+    </header>
+    <div id="overview">
+        <a href="/"> Volver al menu </a>
+        <hr />
+    </div>
+    <div id="columna_central" >
+        <h1> <%= @message %>  </h1>
+    </div>

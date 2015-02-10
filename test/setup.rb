@@ -19,8 +19,6 @@ class MiniTest::Test
 
 end
 
-
-
-Dir["./test/**"].each do |t|
-  require t
+Dir["./test/**"].each do |test|
+  require test
 end

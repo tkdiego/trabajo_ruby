@@ -6,24 +6,19 @@ class TestModelGame < MiniTest::Test
     Server
   end
   
-  #  def load_data
-  #    @game = Game.new
-  #    @game.create_game(3,4,5,4)
-  #  end
-  
-  def test_valid_model_create_game
+  def test_valid_create_game
     game = Game.new
     game.create_game(1,2,5,2)
     game_db= Game.find_by id:(game.id)
     assert game_db == game
   end
   
-  def test_invalid_model_create_game
+  def test_invalid_create_game
     game = Game.new
     assert_raises(ArgumentError) {game.create_game(1,2)}
   end
   
-  def test_valid_model_create_ships
+  def test_valid_create_ships
     ships = [[:"0:0","0:0"], [:"0:1" , "0:1"],[ :"0:2" , "0:2"], [:"0:3" , "0:3"],[ :"0:4", "0:4"],[ :"1:0", "1:0"],[ :"2:0", "2:0"]]
     game = Game.new
     game.create_game(1,2,5,2)
@@ -31,7 +26,7 @@ class TestModelGame < MiniTest::Test
     assert game.ships.where(player_id:1).length == 7
   end
   
-  def test_invalid_model_create_ships
+  def test_invalid_create_ships
     ships = [[:"0:0","0:0"], [:"0:1" , "0:1"],[ :"0:2" , "0:2"], [:"0:3" , "0:3"],[ :"0:4", "0:4"],[ :"1:0", "1:0"]]
     game = Game.new
     game.create_game(1,2,5,2)
@@ -130,16 +125,17 @@ class TestModelGame < MiniTest::Test
     assert_raises(ArgumentError){game.wait_enemy?} 
   end
   
-  def test_valid_game_not_exist_for_player
+  def test_valid_game_exist_for_player
     game = Game.new
     game.create_game(1,2,5,2)
-    assert game.game_not_exist_for_player?(3)
+    assert game.game_exist_for_player?(1)
+    assert game.game_exist_for_player?(2)
   end
   
-  def test_invalid_game_not_exist_for_player
+  def test_invalid_game_exist_for_player
     game = Game.new
     game.create_game(1,2,5,2)
-    assert_raises(ArgumentError){game.game_not_exist_for_player?}
+    assert_raises(ArgumentError){game.game_exist_for_player?}
   end
   
   def test_valid_not_exist_ships

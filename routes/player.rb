@@ -39,7 +39,7 @@ class Server < Sinatra::Base
 		session_logout
 	end
 
-  get '/players/?' do
+  get '/players/:id_player' do
     session_enable
     @list_players = Player.where.not(id: session[:id])
     erb :"player/list", :layout => :layout
@@ -50,6 +50,7 @@ class Server < Sinatra::Base
     if !(p.nil?) && p.authenticate(p.username,params[:password])
       session[:id] = p.id
       session[:enable] = true
+      session[:username] = p.username
       erb :"player/menu", :layout => :layout
 	  else
       status 401

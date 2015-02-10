@@ -1,31 +1,31 @@
-         <div class="container">
-            <header class="sixteen columns">
-                <div id="logo">
-                    <h1>Batalla naval</h1>
-                    <h2>Usuario: <%= session[:username] %> | <a href="/logout"> Logout </a> </h2>
-                </div>
-            </header>
-            <div id="overview">
-                <h3>Por favor, coloque los barcos para la batalla.</h3>
-                <hr />
-            </div>
-            <div id="columna_central" >
-                <form  action="/players/<%=session[:id]%>/game/<%=@game.id%>" method="post" onsubmit="return check_ships_selected()">
-                    <table border="10px">
-                        <% @game.table.to_i.times do |column| %>
-                          <tr>
-                              <% @game.table.to_i.times do |row| %>
-                                <td>
-                                    <input type="checkbox" name="<%= column %>,<%= row %>"
-                                           value="<%= column.to_s + ':' + row.to_s %>" onChange="select_ship(this)"> 
-                                </td>
-                              <% end %>
-                          </tr>
-                        <% end %>
-                    </table>
-                    <br>Se necesita ubicar <input type="text" maxlength="2" size="2" readonly="readonly" style="border:none" name="left_ships" id="left_ships" value="<%= @ships_remaining %>">barcos restantes </br>
-                    <input type="hidden" name="_method" value="put" />
-                    <input type="hidden" name="id_game" value="<%= @game.id %>" />
-                    <input type="submit" value="Iniciar partida">
-                </form>
-            </div>
+<div class="container">
+    <header class="sixteen columns">
+        <div id="logo">
+            <h1>Batalla naval</h1>
+            <h2>Usuario: <%= session[:username] %> | <a href="/logout"> Logout </a> </h2>
+        </div>
+    </header>
+    <div id="overview">
+        <h3>Por favor, coloque los barcos para la batalla.</h3>
+        <hr />
+    </div>
+    <div id="columna_central" >
+        <form  action="/players/<%=session[:id]%>/game/<%=@game.id%>" method="post" onsubmit="return check_ships_selected()">
+            <table border="10px">
+                <% @game.table.to_i.times do |column| %>
+                <tr>
+                  <% @game.table.to_i.times do |row| %>
+                  <td>
+                    <input type="checkbox" name="<%= column %>,<%= row %>"
+                    value="<%= column.to_s + ':' + row.to_s %>" onChange="select_ship(this)"> 
+                </td>
+                <% end %>
+            </tr>
+            <% end %>
+        </table>
+        <br>Se necesita ubicar <input type="text" maxlength="2" size="2" readonly="readonly" style="border:none" name="left_ships" id="left_ships" value="<%= @ships_remaining %>">barcos restantes </br>
+        <input type="hidden" name="_method" value="put" />
+        <input type="hidden" name="id_game" value="<%= @game.id %>" />
+        <input type="submit" value="Iniciar partida">
+    </form>
+</div>

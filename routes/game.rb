@@ -32,7 +32,7 @@ class Server < Sinatra::Base
   get '/players/games/:id_game' do
     session_enable
     @game=Game.find_by_id(params[:id_game])
-    if @game.game_exist_for_player?(session[:id])
+    if @game.nil? || @game.game_exist_for_player?(session[:id])
       @ships_remaining= @game.ships_remaining
       @ships_remaining.to_json
       erb :"game/select_positions",:layout => :layout
@@ -50,7 +50,7 @@ class Server < Sinatra::Base
   put '/players/:id/game/:id_game' do
     session_enable
     game = Game.find_by id: params[:id_game]
-    if game.game_exist_for_player?(session[:id])
+    if @game.nil? || @game.game_exist_for_player?(session[:id])
       if params[:left_ships].to_i != 0
         redirect '/players/games/'+params[:id_game]
       end
@@ -71,7 +71,7 @@ class Server < Sinatra::Base
   get '/players/:id/games/:id_game' do
     session_enable
     @game= Game.find_by id:(params[:id_game])
-    if @game.game_exist_for_player?(session[:id])
+    if @game.nil? || @game.game_exist_for_player?(session[:id])
       if (@game.not_exist_ships?(session[:id]))
         redirect '/players/games/'+ params[:id_game]
       end

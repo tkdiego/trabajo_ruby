@@ -87,7 +87,7 @@ class Server < Sinatra::Base
           @turn_player = "Enemigo"
           erb :"game/wait_turn"
         else
-          @turn_player = Player.find_by id:(session[:id])
+          @turn_player = (Player.find_by id:(session[:id])).username
           erb :"game/show_game", :layout => :layout
         end 
       end  

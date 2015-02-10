@@ -21,6 +21,7 @@ class Server < Sinatra::Base
         erb :"player/list", :layout => :layout
       else
         @game.create_game(session[:id], opponent.id, params[:table], opponent.id)
+        @ships_remaining=@game.ships_remaining
         status 201
         erb :"game/select_positions", :layout => :layout
       end
@@ -119,48 +120,31 @@ class Server < Sinatra::Base
   post '/player/:player_id/games/:id_game/move' do
     session_enable
     game = Game.find_by id: params[:id_game]
-    if !(game.game_exist_for_player?(session[:id]))
-      status 400
-      @message= "400, Bad request: No participa en la partida"
-      @url= '/'
-      @msj_url= "Volver al menu"
+    if game.not_turn_player?(session[:id])
+      status 403
+      @message= "403 Forbidden: Turno del rival."
+      @url= '/players/#{session[:id]}/games/#{params[:id_game]}'
+      @msj_url= "Volver"
       erb :error, :layout => :layout
-    else
-      if game.not_turn_player?(session[:id])
-        status 403
-        @message= "403 Forbidden: Turno del rival."
-        @url= '/players/#{session[:id]}/games/#{params[:id_game]}'
-        @msj_url= "Volver"
-        erb :error, :layout => :layout
+    else   
+      ship= game.enemy_ship(session[:id],params[:attack].to_s)
+      if ship.empty?
+        game.create_attack(session[:id], params[:attack].to_s, "miss")
       else
-        if params[:attack] == nil
-          status 400
-          @message= "400 Bad request: No se ha especificado el ataque."
-          @url= '/players/#{session[:id]}/games/#{params[:id_game]}'
-          @msj_url= "Volver"
-          erb :error, :layout => :layout
-        else
-          ship= game.enemy_ship(session[:id],params[:attack].to_s)
-          if ship.empty?
-            game.create_attack(session[:id], params[:attack].to_s, "miss")
-          else
-            game.create_attack(session[:id], params[:attack].to_s, "throw")
-            ship.last.is_attacked
-          end  
-          status 201
-          if game.enemy_ships_saved?(session[:id])     
-            idPlayer= session[:id].to_s
-            game.update_turn(session[:id])
-            redirect '/players/'+ idPlayer +'/games/' + params[:id_game]
-          else
-            game.update_turn(0)
-            @message= "Has ganado!"
-            erb :"/game/game_over", :layout => :layout
-          end
-        end
+        game.create_attack(session[:id], params[:attack].to_s, "throw")
+        ship.last.is_attacked
+      end  
+      status 201
+      if game.enemy_ships_saved?(session[:id])     
+        idPlayer= session[:id].to_s
+        game.update_turn(session[:id])
+        redirect '/players/'+ idPlayer +'/games/' + params[:id_game]
+      else
+        game.update_turn(0)
+        @message= "Has ganado!"
+        erb :"/game/game_over", :layout => :layout
       end
     end
-
   end
   
   

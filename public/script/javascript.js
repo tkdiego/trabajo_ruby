@@ -18,17 +18,6 @@ function check_ships_selected() {
 
 }
 
-function check_create_game() {
-    enemy = document.getElementById("opponent");
-    table = document.getElementById("table");
-    if ((table.checked !== true) && (enemy.checked !== true)) {
-       alert("No se ha realizado la seleccion de manera correcta.");
-       return false;
-   } else {
-        return true;
-    }
-}
-
 function set_attack(coordinate) {
     if (parseInt(document.getElementById("first_attack").value) === 0) {
         document.getElementById("attack").value = coordinate;
@@ -46,3 +35,27 @@ function control_attack() {
     return true;
 }
 
+function check_create_game() {
+    opponent_ok= false;
+    index_t=0;
+    index_o=0;
+    for (i = 0; i < document.formu.opponent.length; i++) {
+        if (document.formu.opponent[i].checked) {
+            index_o=i;
+            opponent_ok = true;
+        }
+    }
+    table_ok = false;
+    for (x = 0; x < document.formu.table.length; x++) {
+        if (document.formu.table[x].checked) {
+            index_t=x;
+            table_ok = true;
+        }
+    }
+    if (opponent_ok && table_ok) {
+        return true;
+    } else {
+        alert("No se ha realizado la seleccion de manera correcta.");
+        return false;
+    }
+}
